@@ -28,6 +28,25 @@ void ATurnManager::BeginPlay()
 	}
 }
 
+void ATurnManager::StartGame(int32 GridSize, int32 CatCount, int32 MouseCount)
+{
+	GridManager->GenerateGrid(GridSize);
+
+	for (int i = 0; i < CatCount; ++i)
+	{
+		MammalManager->SpawnMammal(EMammalType::Cat, GridManager->GetRandomFreeGrid()->GetActorLocation());
+	}
+	for (int i = 0; i < MouseCount; ++i)
+	{
+		MammalManager->SpawnMammal(EMammalType::Mouse, GridManager->GetRandomFreeGrid()->GetActorLocation());
+	}
+}
+
+void ATurnManager::ContinueRound()
+{
+	MammalManager->MoveMammals();
+}
+
 // Called every frame
 void ATurnManager::Tick(float DeltaTime)
 {

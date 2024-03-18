@@ -19,7 +19,9 @@ public:
 	//generate the grid
 	UFUNCTION(BlueprintCallable)
 	void GenerateGrid(int32 Size);
-	
+
+	UFUNCTION(BlueprintCallable)
+	ABaseGrid* GetRandomFreeGrid();
 	TArray<TArray<ABaseGrid*>> GetAllGrids() const { return GridCells;}
 	
 	UPROPERTY(EditAnywhere)

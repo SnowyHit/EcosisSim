@@ -25,13 +25,29 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-	void SpawnMammal(EMammalType MammalType ,FVector3d Location);
+	
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<ACat> CatRef;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AMouse> MouseRef;
+	UFUNCTION(BlueprintCallable)
+	int GetCatCount();
+	UFUNCTION(BlueprintCallable)
+	int GetMouseCount();
 	TArray<AMammal*> AllMammals;
 	TArray<ACat*> Cats;
 	TArray<AMouse*> Mouses;
+	UFUNCTION()
+	void HandleMammalDeath(AMammal* DeadMammal);
 	
 public:
+	UFUNCTION()
+	void SpawnMammal(EMammalType MammalType ,FVector3d Location);
+	UFUNCTION()
+	void MoveMammals();
+	UFUNCTION()
+	void BreedMammal(AMammal* MammalToBreed);
+	
 	TArray<AMammal*> GetAllMammals() const { return AllMammals;}
 	TArray<ACat*> GetAllCats() const { return Cats;}
 	TArray<AMouse*> GetAllMouses() const { return Mouses;}

@@ -3,6 +3,9 @@
 
 #include "GridManager.h"
 
+#include "MammalManager.h"
+#include "Kismet/GameplayStatics.h"
+
 
 // Sets default values
 AGridManager::AGridManager()
@@ -20,7 +23,7 @@ void AGridManager::GenerateGrid(int32 Size)
 		GridCells[i].SetNum(Size);
 	}
 
-	// Create grid cells and set their neighbors
+	// Spawn grid cells
 	for (int32 Row = 0; Row < Size; ++Row)
 	{
 		for (int32 Col = 0; Col < Size; ++Col)
@@ -28,26 +31,58 @@ void AGridManager::GenerateGrid(int32 Size)
 			ABaseGrid* NewCell = GetWorld()->SpawnActor<ABaseGrid>(ABaseGrid::StaticClass());
 			GridCells[Row][Col] = NewCell;
 			NewCell->SetCoordinates(Row, Col); // Set coordinates for the cell
-			NewCell->SetMaterial(GridMat); //Set The MaterialForGrid
-			// Set neighbors for the cell
-			if (Row > 0) // Check if not in the top row
-				{
-				NewCell->SetNeighbors(GridCells[Row - 1][Col], nullptr, nullptr, nullptr);
-				}
-			if (Row < Size - 1) // Check if not in the bottom row
-				{
-				NewCell->SetNeighbors(nullptr, GridCells[Row + 1][Col], nullptr, nullptr);
-				}
-			if (Col > 0) // Check if not in the leftmost column
-				{
-				NewCell->SetNeighbors(nullptr, nullptr, nullptr, GridCells[Row][Col - 1]);
-				}
-			if (Col < Size - 1) // Check if not in the rightmost column
-				{
-				NewCell->SetNeighbors(nullptr, nullptr, GridCells[Row][Col + 1], nullptr);
-				}
+			NewCell->SetMaterial(GridMat); // Set the MaterialForGrid
 		}
 	}
+
+	// Set neighbors for each grid cell
+	for (int32 Row = 0; Row < Size; ++Row)
+	{
+		for (int32 Col = 0; Col < Size; ++Col)
+		{
+			ABaseGrid* CurrentCell = GridCells[Row][Col];
+
+			// Top neighbor
+			if (Row > 0)
+				CurrentCell->SetNeighbors(GridCells[Row - 1][Col], nullptr, nullptr, nullptr);
+
+			// Bottom neighbor
+			if (Row < Size - 1)
+				CurrentCell->SetNeighbors(nullptr, GridCells[Row + 1][Col], nullptr, nullptr);
+
+			// Left neighbor
+			if (Col > 0)
+				CurrentCell->SetNeighbors(nullptr, nullptr, nullptr, GridCells[Row][Col - 1]);
+
+			// Right neighbor
+			if (Col < Size - 1)
+				CurrentCell->SetNeighbors(nullptr, nullptr, GridCells[Row][Col + 1], nullptr);
+		}
+	}
+}
+
+ABaseGrid* AGridManager::GetRandomFreeGrid()
+{
+	TArray<ABaseGrid*> FreeGrids;
+	for (auto Element : GetAllGrids())
+	{
+		for (auto BaseGrid : Element)
+		{
+			if(!IsValid(BaseGrid->CurrentActor))
+			{
+				FreeGrids.Add(BaseGrid);
+			}
+		}
+	}
+
+	if (FreeGrids.Num() > 0)
+	{
+		int32 RandomIndex = FMath::RandRange(0, FreeGrids.Num() - 1);
+
+		return FreeGrids[RandomIndex];
+	}
+
+	return nullptr;
 }
 
 // Called when the game starts or when spawned

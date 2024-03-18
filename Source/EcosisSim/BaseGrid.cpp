@@ -9,7 +9,7 @@ ABaseGrid::ABaseGrid()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	
+	Neighbors = TMap<EDirection , ABaseGrid*>();
 	GridX = 0;
 	GridY = 0;
 	// Create and attach the visual mesh component
@@ -39,12 +39,12 @@ void ABaseGrid::SetCoordinates(int32 X, int32 Y)
 	// Set position based on coordinates
 	FVector CellPosition = FVector(GridX * 100.0f, GridY * 100.0f, 0.0f); // Assuming each cell is 100 units wide
 	SetActorLocation(CellPosition);
-	SetActorScale3D(FVector3d(0.95f , 0.95f, 0.2f));
+	SetActorScale3D(FVector3d(1 , 1, 0.2f));
 }
 
 void ABaseGrid::SetNeighbors(ABaseGrid* North, ABaseGrid* South, ABaseGrid* East, ABaseGrid* West)
 {
-	Neighbors.Empty(); // Clear existing neighbors
+	//Neighbors.Empty(); // Clear existing neighbors
 
 	// Add provided neighbors to the array
 	if (North != nullptr)
@@ -67,7 +67,7 @@ void ABaseGrid::SetNeighbors(ABaseGrid* North, ABaseGrid* South, ABaseGrid* East
 
 ABaseGrid* ABaseGrid::GetRandomFreeNeighbor() const
 {
-	if (Neighbors.Num() == 0)
+	if (Neighbors.IsEmpty())
 	{
 		return nullptr; // No neighbors
 	}

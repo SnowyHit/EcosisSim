@@ -30,11 +30,7 @@ void AMammal::Breed()
 {
 	if(CanBreed)
 	{
-		//Breed
-		if(auto const GridToBreed  = CurrentGrid->GetRandomFreeNeighbor())
-		{
-			
-		}
+		OnBreed.Broadcast(this);
 	}
 }
 
@@ -51,6 +47,7 @@ void AMammal::Move()
 void AMammal::Die()
 {
 	CurrentGrid->CurrentActor = nullptr;
+	OnDeath.Broadcast(this);
 	Destroy();
 }
 

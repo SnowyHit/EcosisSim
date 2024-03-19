@@ -3,6 +3,8 @@
 
 #include "Cat.h"
 
+#include "Mouse.h"
+
 
 // Sets default values
 ACat::ACat()
@@ -11,16 +13,49 @@ ACat::ACat()
 	PrimaryActorTick.bCanEverTick = true;
 }
 
-// Called when the game starts or when spawned
-void ACat::BeginPlay()
+void ACat::GainAge()
 {
-	Super::BeginPlay();
-	
+	Super::GainAge();
+	TimeTillLastEaten +=1;
+	if(Age >= 8)
+	{
+		CanBreed = true;
+	}
 }
 
-// Called every frame
-void ACat::Tick(float DeltaTime)
+void ACat::Move()
 {
-	Super::Tick(DeltaTime);
+	for (auto Element : CurrentGrid->Neighbors)
+	{
+		if(!Element.Value->IsGridFree())
+		{
+			if(auto const Mouse = Cast<AMouse>(Element.Value->CurrentActor))
+			{
+				Mouse->Die();
+				TimeTillLastEaten = 0;
+				CurrentGrid->CurrentActor = nullptr;
+				Element.Value->CurrentActor = this;
+				CurrentGrid = Element.Value;
+				this->SetActorLocation(Element.Value->GetActorLocation() + FVector3d(0,0,30));
+				return;
+			}
+		}
+	}
+	if(auto const GridToMove  = CurrentGrid->GetRandomFreeNeighbor())
+	{
+		CurrentGrid->CurrentActor = nullptr;
+		GridToMove->CurrentActor = this;
+		CurrentGrid = GridToMove;
+		this->SetActorLocation(GridToMove->GetActorLocation() + FVector3d(0,0,30));
+	}
+}
+
+void ACat::Breed(AMammalManager* Spawner)
+{
+	Super::Breed(Spawner);
+	if(TimeTillLastEaten >= 3)
+	{
+		Die();
+	}
 }
 

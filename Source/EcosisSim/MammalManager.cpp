@@ -19,40 +19,61 @@ void AMammalManager::BeginPlay()
 	Super::BeginPlay();
 }
 
-void AMammalManager::SpawnMammal(EMammalType MammalType ,FVector3d Location)
+void AMammalManager::SpawnMammal(EMammalType MammalType ,FVector3d Location , ABaseGrid* GridToSpawn)
 {
 	if(MammalType == EMammalType::Cat)
 	{
 		ACat* SpawnedCat = GetWorld()->SpawnActor<ACat>(CatRef);
 		SpawnedCat->SetActorLocation(Location + FVector3d(0,0,30));
 		SpawnedCat->SetActorScale3D(FVector3d(0.8f, 0.8f , 0.5f));
+		SpawnedCat->CurrentGrid = GridToSpawn;
+		GridToSpawn->CurrentActor = SpawnedCat;
+		SpawnedCat->Type = MammalType;
 		Cats.Add(SpawnedCat);
 		AllMammals.Add(SpawnedCat);
 		SpawnedCat->OnDeath.AddDynamic(this , &AMammalManager::HandleMammalDeath);
-		SpawnedCat->OnBreed.AddDynamic(this , &AMammalManager::BreedMammal);
 	}
 	else
 	{
 		AMouse* SpawnedMouse= GetWorld()->SpawnActor<AMouse>(MouseRef);
 		SpawnedMouse->SetActorLocation(Location + FVector3d(0,0,30));
 		SpawnedMouse->SetActorScale3D(FVector3d(0.8f, 0.8f , 0.5f));
+		SpawnedMouse->CurrentGrid = GridToSpawn;
+		GridToSpawn->CurrentActor = SpawnedMouse;
+		SpawnedMouse->Type = MammalType;
 		Mouses.Add(SpawnedMouse);
 		AllMammals.Add(SpawnedMouse);
 		SpawnedMouse->OnDeath.AddDynamic(this , &AMammalManager::HandleMammalDeath);
-		SpawnedMouse->OnBreed.AddDynamic(this , &AMammalManager::BreedMammal);
 	}
 }
 
 void AMammalManager::MoveMammals()
 {
-	for (auto Element : AllMammals)
+	for (auto Element : Cats)
+	{
+		Element->Move();
+	}
+	for (auto Element : Mouses)
 	{
 		Element->Move();
 	}
 }
 
-void AMammalManager::BreedMammal(AMammal* MammalToBreed)
+void AMammalManager::BreedMammals()
 {
+	TArray<AMammal*> CurrentMammals = AllMammals;
+	for (auto Element : CurrentMammals)
+	{
+		Element->Breed(this);
+	}
+}
+
+void AMammalManager::AgeMammals()
+{
+	for (auto Element : AllMammals)
+	{
+		Element->GainAge();
+	}
 }
 
 void AMammalManager::HandleMammalDeath(AMammal* DeadMammal)

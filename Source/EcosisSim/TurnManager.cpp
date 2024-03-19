@@ -31,20 +31,27 @@ void ATurnManager::BeginPlay()
 void ATurnManager::StartGame(int32 GridSize, int32 CatCount, int32 MouseCount)
 {
 	GridManager->GenerateGrid(GridSize);
-
 	for (int i = 0; i < CatCount; ++i)
 	{
-		MammalManager->SpawnMammal(EMammalType::Cat, GridManager->GetRandomFreeGrid()->GetActorLocation());
+		ABaseGrid* GridToSpawn = GridManager->GetRandomFreeGrid();
+		MammalManager->SpawnMammal(EMammalType::Cat,GridToSpawn->GetActorLocation() , GridToSpawn);
 	}
 	for (int i = 0; i < MouseCount; ++i)
 	{
-		MammalManager->SpawnMammal(EMammalType::Mouse, GridManager->GetRandomFreeGrid()->GetActorLocation());
+		ABaseGrid* GridToSpawn = GridManager->GetRandomFreeGrid();
+		MammalManager->SpawnMammal(EMammalType::Mouse, GridToSpawn->GetActorLocation() , GridToSpawn);
 	}
 }
 
 void ATurnManager::ContinueRound()
 {
+	//First Move All Mammals
 	MammalManager->MoveMammals();
+	//Gain Age for all mammals , this is between moving and breeding because cats can eat before they starve.
+	MammalManager->AgeMammals();
+	//Then Breed all breedable Mammals
+	MammalManager->BreedMammals();
+	
 }
 
 // Called every frame

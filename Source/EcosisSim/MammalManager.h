@@ -7,12 +7,7 @@
 #include "Mouse.h"
 #include "GameFramework/Actor.h"
 #include "MammalManager.generated.h"
-UENUM(BlueprintType)
-enum class EMammalType : uint8
-{
-	Cat UMETA(DisplayName = "Cat"),
-	Mouse UMETA(DisplayName = "Mouse"),
-};
+
 UCLASS()
 class ECOSISSIM_API AMammalManager : public AActor
 {
@@ -42,11 +37,13 @@ protected:
 	
 public:
 	UFUNCTION()
-	void SpawnMammal(EMammalType MammalType ,FVector3d Location);
+	void SpawnMammal(EMammalType MammalType ,FVector3d Location , ABaseGrid* gridToSpawn);
 	UFUNCTION()
 	void MoveMammals();
 	UFUNCTION()
-	void BreedMammal(AMammal* MammalToBreed);
+	void BreedMammals();
+	UFUNCTION()
+	void AgeMammals();
 	
 	TArray<AMammal*> GetAllMammals() const { return AllMammals;}
 	TArray<ACat*> GetAllCats() const { return Cats;}

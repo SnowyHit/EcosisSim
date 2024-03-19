@@ -44,9 +44,6 @@ void ABaseGrid::SetCoordinates(int32 X, int32 Y)
 
 void ABaseGrid::SetNeighbors(ABaseGrid* North, ABaseGrid* South, ABaseGrid* East, ABaseGrid* West)
 {
-	//Neighbors.Empty(); // Clear existing neighbors
-
-	// Add provided neighbors to the array
 	if (North != nullptr)
 	{
 		Neighbors.Add(EDirection::North,North);
@@ -65,31 +62,34 @@ void ABaseGrid::SetNeighbors(ABaseGrid* North, ABaseGrid* South, ABaseGrid* East
 	}
 }
 
-ABaseGrid* ABaseGrid::GetRandomFreeNeighbor() const
+ABaseGrid* ABaseGrid::GetRandomFreeNeighbor()
 {
 	if (Neighbors.IsEmpty())
 	{
 		return nullptr; // No neighbors
 	}
 	
-	TArray<EDirection> DirectionArray;
-	Neighbors.GenerateKeyArray(DirectionArray);
-	for (auto Direction : DirectionArray)
+	TArray<ABaseGrid*> DirectionArray;
+	for (auto Pair : Neighbors)
 	{
-		if(auto const grid =  Neighbors[Direction])
+		if(Pair.Value->IsGridFree())
 		{
-			if(!IsValid(grid->CurrentActor))
-			{
-				DirectionArray.Remove(Direction);
-			}
+			DirectionArray.Add(Pair.Value);
 		}
 	}
-	int32 RandomIndex = FMath::RandRange(0, DirectionArray.Num() - 1);
-	if(RandomIndex <= 0)
+	
+	if(DirectionArray.IsEmpty())
 	{
 		return nullptr;
 	}
-	return Neighbors[DirectionArray[RandomIndex]];
+	
+	int32 RandomIndex = FMath::RandRange(0, DirectionArray.Num() - 1);
+	return DirectionArray[RandomIndex];
+}
+
+bool ABaseGrid::IsGridFree()
+{
+	return !IsValid(CurrentActor);
 }
 
 

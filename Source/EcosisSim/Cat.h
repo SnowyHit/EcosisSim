@@ -15,11 +15,9 @@ public:
 	// Sets default values for this actor's properties
 	ACat();
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	virtual void GainAge() override;
+	virtual void Move() override;
+	virtual void Breed(AMammalManager* Spawner) override;
+	
+	int TimeTillLastEaten;
 };

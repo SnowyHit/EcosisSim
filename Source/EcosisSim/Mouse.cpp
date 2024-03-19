@@ -11,16 +11,13 @@ AMouse::AMouse()
 	PrimaryActorTick.bCanEverTick = true;
 }
 
-// Called when the game starts or when spawned
-void AMouse::BeginPlay()
+void AMouse::GainAge()
 {
-	Super::BeginPlay();
-	
+	Super::GainAge();
+	if(Age >= 3)
+	{
+		CanBreed = true;
+	}
 }
 
-// Called every frame
-void AMouse::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
 

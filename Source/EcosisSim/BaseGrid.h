@@ -21,7 +21,6 @@ class ECOSISSIM_API ABaseGrid : public AActor
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this actor's properties
 	ABaseGrid();
 	
 	UPROPERTY(VisibleAnywhere)
@@ -31,18 +30,21 @@ public:
 	int32 GridY;
 
 	void SetCoordinates(int32 X, int32 Y);
-	// Function to set neighboring cells
 	void SetNeighbors(ABaseGrid* North, ABaseGrid* South, ABaseGrid* East, ABaseGrid* West);
-	void SetMaterial(UMaterialInterface* Material); // Function to get a random neighbor
-   
-	ABaseGrid* GetRandomFreeNeighbor() const;
+	void SetMaterial(UMaterialInterface* Material); 
 
+	UFUNCTION()
+	ABaseGrid* GetRandomFreeNeighbor();
+	
+	UPROPERTY(VisibleAnywhere)
 	AActor* CurrentActor;
-
+	
+	UFUNCTION()
+	bool IsGridFree();
+	
+	UPROPERTY(VisibleAnywhere)
+	TMap<EDirection, ABaseGrid*> Neighbors;
 protected:
 	virtual void BeginPlay() override;
-
 private:
-	
-	TMap<EDirection, ABaseGrid*> Neighbors;
 };

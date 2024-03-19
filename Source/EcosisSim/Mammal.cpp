@@ -1,37 +1,34 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+﻿#include "Mammal.h"
 
+#include "MammalManager.h"
 
-#include "Mammal.h"
-
-#include "Kismet/GameplayStatics.h"
-
-
-// Sets default values
 AMammal::AMammal()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	
 	PrimaryActorTick.bCanEverTick = true;
 }
 
-// Called when the game starts or when spawned
 void AMammal::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
-void AMammal::PlayTurn()
-{
-	Age += 1;
-	Move();
-	Breed();
-}
 
-void AMammal::Breed()
+void AMammal::Breed(AMammalManager* Spawner)
 {
 	if(CanBreed)
 	{
-		OnBreed.Broadcast(this);
+		if(auto const NeighborToBreed = CurrentGrid->GetRandomFreeNeighbor())
+		{
+			Spawner->SpawnMammal(Type ,NeighborToBreed->GetActorLocation() , NeighborToBreed);
+		}
+		CanBreed = false;
 	}
+}
+
+void AMammal::GainAge()
+{
+	Age += 1;
 }
 
 void AMammal::Move()
@@ -41,6 +38,7 @@ void AMammal::Move()
 		CurrentGrid->CurrentActor = nullptr;
 		GridToMove->CurrentActor = this;
 		CurrentGrid = GridToMove;
+		this->SetActorLocation(GridToMove->GetActorLocation() + FVector3d(0,0,30));
 	}
 }
 

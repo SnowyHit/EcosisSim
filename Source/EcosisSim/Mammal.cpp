@@ -16,6 +16,7 @@ void AMammal::Breed()
 			SpawnerClass->SpawnMammal(Type ,NeighborToBreed->GetActorLocation() , NeighborToBreed ,true);
 		}
 		CanBreed = false;
+		Age=0; //This part is what i found reasonable. After breeding it needs to take more rounds to be abe to breed again.
 	}
 }
 

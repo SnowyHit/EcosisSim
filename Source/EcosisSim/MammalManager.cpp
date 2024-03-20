@@ -3,6 +3,7 @@
 
 #include "MammalManager.h"
 
+#include "Algo/IndexOf.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -76,28 +77,13 @@ void AMammalManager::StartMammalsTurn()
 		AllMammals[0]->OnMovementEnded.AddDynamic(this , &AMammalManager::MammalMovementChain); //Then fire the movement chain after movement ends
 	}
 }
-
-void AMammalManager::BreedMammals()
-{
-	TArray<AMammal*> CurrentMammals = AllMammals;
-	for (auto Element : CurrentMammals)
-	{
-		Element->Breed();
-	}
-}
-
-void AMammalManager::AgeMammals()
-{
-	for (auto Element : AllMammals)
-	{
-		Element->GainAge();
-	}
-}
-
 void AMammalManager::MammalMovementChain(AMammal* MovingMammal)
 {
-	//in here we now go the the next mammal in line
-	MammalPlayingTurn+=1;
+	//Mammal made its movement , now aging and breeding.
+	MovingMammal->GainAge();
+	MovingMammal->Breed();
+	MovingMammal->OnMovementEnded.Clear();// Clear the delegate to get ready for the next round
+	MammalPlayingTurn+=1;//in here we now go the the next mammal in line
 	if(AllMammals.Num() > MammalPlayingTurn)
 	{
 		AllMammals[MammalPlayingTurn]->Move();
@@ -106,13 +92,10 @@ void AMammalManager::MammalMovementChain(AMammal* MovingMammal)
 	}
 	else
 	{
-		//here we know the chain ended so we end the movement part , age them and calculate breeding.
+		//here we know the chain ended so we end the movement part.
 		OnAllMovementEnded.Broadcast();
-		AgeMammals();
-		BreedMammals();
 		HandleNewlyBredLists(); // After breeding we need to handle all the arrays.
 	}
-	MovingMammal->OnMovementEnded.Clear(); // Clear the delegate to get ready for the next round
 }
 
 void AMammalManager::HandleMammalDeath(AMammal* DeadMammal)
@@ -125,6 +108,12 @@ void AMammalManager::HandleMammalDeath(AMammal* DeadMammal)
 	{
 		Cats.Remove(Cat);
 	}
+	//If an mammal dies after their move turn(by age or starvation) , it causes a element index problem on all mammals , because of this i keep them if their turn is done , remove them from the lists after the round ends.
+	if(AllMammals.IndexOfByKey(DeadMammal) < MammalPlayingTurn)
+	{
+		DeadMammals.Add(DeadMammal);
+		return;
+	}
 	AllMammals.Remove(DeadMammal);
 }
 
@@ -136,6 +125,13 @@ void AMammalManager::HandleNewlyBredLists()
 	AllMammals.Append(NewlyBredMouses);
 	NewlyBredMouses.Empty();
 	NewlyBredCats.Empty();
+	for (auto Element : DeadMammals)
+	{
+		if(AllMammals.Contains(Element))
+		{
+			AllMammals.Remove(Element);
+		}
+	}
 }
 
 int AMammalManager::GetCatCount()

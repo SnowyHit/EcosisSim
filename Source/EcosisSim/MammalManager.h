@@ -37,6 +37,7 @@ protected:
 	TArray<AMouse*> Mouses;
 	TArray<ACat*> NewlyBredCats;
 	TArray<AMouse*> NewlyBredMouses;
+	TArray<AMammal*> DeadMammals;
 	UFUNCTION()
 	void HandleMammalDeath(AMammal* DeadMammal);
 	UFUNCTION()
@@ -46,10 +47,6 @@ public:
 	void SpawnMammal(EMammalType MammalType ,FVector3d Location , ABaseGrid* gridToSpawn, bool isBreeding = false);
 	UFUNCTION()
 	void StartMammalsTurn();
-	UFUNCTION()
-	void BreedMammals();
-	UFUNCTION()
-	void AgeMammals();
 
 	UFUNCTION()
 	void MammalMovementChain(AMammal* MovingMammal);

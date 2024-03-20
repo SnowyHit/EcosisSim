@@ -2,16 +2,13 @@
 
 
 #include "GridManager.h"
-
 #include "MammalManager.h"
-#include "Kismet/GameplayStatics.h"
 
 
 // Sets default values
 AGridManager::AGridManager()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	
 }
 
 void AGridManager::GenerateGrid(int32 Size)

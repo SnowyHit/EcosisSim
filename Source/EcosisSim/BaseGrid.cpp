@@ -7,8 +7,6 @@
 // Sets default values
 ABaseGrid::ABaseGrid()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
 	Neighbors = TMap<EDirection , ABaseGrid*>();
 	GridX = 0;
 	GridY = 0;
@@ -41,7 +39,7 @@ void ABaseGrid::SetCoordinates(int32 X, int32 Y)
 	SetActorLocation(CellPosition);
 	SetActorScale3D(FVector3d(1 , 1, 0.2f));
 }
-
+//For every grid , i want to know its neighbours so this function is a must call.
 void ABaseGrid::SetNeighbors(ABaseGrid* North, ABaseGrid* South, ABaseGrid* East, ABaseGrid* West)
 {
 	if (North != nullptr)
@@ -68,23 +66,24 @@ ABaseGrid* ABaseGrid::GetRandomFreeNeighbor()
 	{
 		return nullptr; // No neighbors
 	}
-	
-	TArray<ABaseGrid*> DirectionArray;
+
+	//Array for free grids
+	TArray<ABaseGrid*> FreeGrids;
 	for (auto Pair : Neighbors)
 	{
 		if(Pair.Value->IsGridFree())
 		{
-			DirectionArray.Add(Pair.Value);
+			FreeGrids.Add(Pair.Value);
 		}
 	}
 	
-	if(DirectionArray.IsEmpty())
+	if(FreeGrids.IsEmpty())
 	{
 		return nullptr;
 	}
 	
-	int32 RandomIndex = FMath::RandRange(0, DirectionArray.Num() - 1);
-	return DirectionArray[RandomIndex];
+	int32 RandomIndex = FMath::RandRange(0, FreeGrids.Num() - 1);
+	return FreeGrids[RandomIndex];
 }
 
 bool ABaseGrid::IsGridFree()
@@ -97,7 +96,7 @@ void ABaseGrid::SetMaterial(UMaterialInterface* Material)
 {
 	if (VisualMesh)
 	{
-		VisualMesh->SetMaterial(0, Material); // Assuming you have only one material slot
+		VisualMesh->SetMaterial(0, Material);
 	}
 }
 

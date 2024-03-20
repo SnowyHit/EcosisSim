@@ -7,13 +7,6 @@ AMammal::AMammal()
 	
 	PrimaryActorTick.bCanEverTick = true;
 }
-
-void AMammal::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
-
 void AMammal::Breed()
 {
 	if(CanBreed)

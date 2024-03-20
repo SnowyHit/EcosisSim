@@ -8,6 +8,7 @@
 #include "GameFramework/Actor.h"
 #include "MammalManager.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAllMovementEndedDelegate);
 UCLASS()
 class ECOSISSIM_API AMammalManager : public AActor
 {
@@ -30,21 +31,33 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	int GetMouseCount();
 	TArray<AMammal*> AllMammals;
+	UPROPERTY(VisibleAnywhere)
 	TArray<ACat*> Cats;
+	UPROPERTY(VisibleAnywhere)
 	TArray<AMouse*> Mouses;
+	TArray<ACat*> NewlyBredCats;
+	TArray<AMouse*> NewlyBredMouses;
 	UFUNCTION()
 	void HandleMammalDeath(AMammal* DeadMammal);
-	
+	UFUNCTION()
+	void HandleNewlyBredLists();
 public:
 	UFUNCTION()
-	void SpawnMammal(EMammalType MammalType ,FVector3d Location , ABaseGrid* gridToSpawn);
+	void SpawnMammal(EMammalType MammalType ,FVector3d Location , ABaseGrid* gridToSpawn, bool isBreeding = false);
 	UFUNCTION()
-	void MoveMammals();
+	void StartMammalsTurn();
 	UFUNCTION()
 	void BreedMammals();
 	UFUNCTION()
 	void AgeMammals();
-	
+
+	UFUNCTION()
+	void MammalMovementChain(AMammal* MovingMammal);
+
+	UPROPERTY(BlueprintAssignable)
+	FOnAllMovementEndedDelegate OnAllMovementEnded;
+	UPROPERTY(EditAnywhere , BlueprintReadWrite)
+	int MammalPlayingTurn;
 	TArray<AMammal*> GetAllMammals() const { return AllMammals;}
 	TArray<ACat*> GetAllCats() const { return Cats;}
 	TArray<AMouse*> GetAllMouses() const { return Mouses;}

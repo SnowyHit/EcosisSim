@@ -7,6 +7,8 @@
 #include "GameFramework/Actor.h"
 #include "Mammal.generated.h"
 
+class AMammalManager;
+
 UENUM(BlueprintType)
 enum class EMammalType : uint8
 {
@@ -15,6 +17,7 @@ enum class EMammalType : uint8
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDeathDelegate, AMammal*, DeadMammal);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMovementEndedDelegate, AMammal*, DeadMammal);
 UCLASS()
 class ECOSISSIM_API AMammal : public AActor
 {
@@ -25,15 +28,20 @@ public:
 	AMammal();
 
 	FOnDeathDelegate OnDeath;
+	FOnMovementEndedDelegate OnMovementEnded;
 	UFUNCTION(BlueprintCallable)
 	virtual void Move();
-	
+
+	UFUNCTION(BlueprintNativeEvent)
+	void StartPhysicalMovement();
 	UFUNCTION(BlueprintCallable)
-	virtual void Breed(AMammalManager* Spawner);
+	virtual void Breed();
 
 	UFUNCTION(BlueprintCallable)
 	virtual void GainAge();
-	UPROPERTY(VisibleAnywhere)
+	UFUNCTION(BlueprintCallable)
+	virtual void MovementEnded();
+	UPROPERTY(VisibleAnywhere , BlueprintReadOnly)
 	ABaseGrid* CurrentGrid;
 
 	UPROPERTY(VisibleAnywhere)
@@ -43,6 +51,8 @@ public:
 
 	virtual void Die();
 	EMammalType Type;
+	UPROPERTY(BlueprintReadOnly)
+	AMammalManager* SpawnerClass;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

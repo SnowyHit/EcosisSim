@@ -14,13 +14,13 @@ void AMammal::BeginPlay()
 }
 
 
-void AMammal::Breed(AMammalManager* Spawner)
+void AMammal::Breed()
 {
 	if(CanBreed)
 	{
 		if(auto const NeighborToBreed = CurrentGrid->GetRandomFreeNeighbor())
 		{
-			Spawner->SpawnMammal(Type ,NeighborToBreed->GetActorLocation() , NeighborToBreed);
+			SpawnerClass->SpawnMammal(Type ,NeighborToBreed->GetActorLocation() , NeighborToBreed ,true);
 		}
 		CanBreed = false;
 	}
@@ -31,6 +31,11 @@ void AMammal::GainAge()
 	Age += 1;
 }
 
+void AMammal::MovementEnded()
+{
+	OnMovementEnded.Broadcast(this);
+}
+
 void AMammal::Move()
 {
 	if(auto const GridToMove  = CurrentGrid->GetRandomFreeNeighbor())
@@ -38,8 +43,12 @@ void AMammal::Move()
 		CurrentGrid->CurrentActor = nullptr;
 		GridToMove->CurrentActor = this;
 		CurrentGrid = GridToMove;
-		this->SetActorLocation(GridToMove->GetActorLocation() + FVector3d(0,0,30));
 	}
+}
+
+void AMammal::StartPhysicalMovement_Implementation()
+{
+	
 }
 
 void AMammal::Die()

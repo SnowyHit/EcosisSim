@@ -36,7 +36,6 @@ void ACat::Move()
 				CurrentGrid->CurrentActor = nullptr;
 				Element.Value->CurrentActor = this;
 				CurrentGrid = Element.Value;
-				this->SetActorLocation(Element.Value->GetActorLocation() + FVector3d(0,0,30));
 				return;
 			}
 		}
@@ -46,13 +45,12 @@ void ACat::Move()
 		CurrentGrid->CurrentActor = nullptr;
 		GridToMove->CurrentActor = this;
 		CurrentGrid = GridToMove;
-		this->SetActorLocation(GridToMove->GetActorLocation() + FVector3d(0,0,30));
 	}
 }
 
-void ACat::Breed(AMammalManager* Spawner)
+void ACat::Breed()
 {
-	Super::Breed(Spawner);
+	Super::Breed();
 	if(TimeTillLastEaten >= 3)
 	{
 		Die();

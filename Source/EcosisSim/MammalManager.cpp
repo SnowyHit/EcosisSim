@@ -19,7 +19,7 @@ void AMammalManager::BeginPlay()
 	Super::BeginPlay();
 }
 
-void AMammalManager::SpawnMammal(EMammalType MammalType ,FVector3d Location , ABaseGrid* GridToSpawn)
+void AMammalManager::SpawnMammal(EMammalType MammalType ,FVector3d Location , ABaseGrid* GridToSpawn , bool isBreeding)
 {
 	if(MammalType == EMammalType::Cat)
 	{
@@ -29,8 +29,16 @@ void AMammalManager::SpawnMammal(EMammalType MammalType ,FVector3d Location , AB
 		SpawnedCat->CurrentGrid = GridToSpawn;
 		GridToSpawn->CurrentActor = SpawnedCat;
 		SpawnedCat->Type = MammalType;
-		Cats.Add(SpawnedCat);
-		AllMammals.Add(SpawnedCat);
+		SpawnedCat->SpawnerClass = this;
+		if(isBreeding)
+		{
+			NewlyBredCats.Add(SpawnedCat);
+		}
+		else
+		{
+			Cats.Add(SpawnedCat);
+			AllMammals.Add(SpawnedCat);
+		}
 		SpawnedCat->OnDeath.AddDynamic(this , &AMammalManager::HandleMammalDeath);
 	}
 	else
@@ -41,21 +49,28 @@ void AMammalManager::SpawnMammal(EMammalType MammalType ,FVector3d Location , AB
 		SpawnedMouse->CurrentGrid = GridToSpawn;
 		GridToSpawn->CurrentActor = SpawnedMouse;
 		SpawnedMouse->Type = MammalType;
-		Mouses.Add(SpawnedMouse);
-		AllMammals.Add(SpawnedMouse);
+		SpawnedMouse->SpawnerClass = this;
+		if(isBreeding)
+		{
+			NewlyBredMouses.Add(SpawnedMouse);
+		}
+		else
+		{
+			Mouses.Add(SpawnedMouse);
+			AllMammals.Add(SpawnedMouse);
+		}
 		SpawnedMouse->OnDeath.AddDynamic(this , &AMammalManager::HandleMammalDeath);
 	}
 }
 
-void AMammalManager::MoveMammals()
+void AMammalManager::StartMammalsTurn()
 {
-	for (auto Element : Cats)
+	MammalPlayingTurn = 0;
+	if(!AllMammals.IsEmpty())
 	{
-		Element->Move();
-	}
-	for (auto Element : Mouses)
-	{
-		Element->Move();
+		AllMammals[0]->Move();
+		AllMammals[0]->StartPhysicalMovement();
+		AllMammals[0]->OnMovementEnded.AddDynamic(this , &AMammalManager::MammalMovementChain);
 	}
 }
 
@@ -64,7 +79,7 @@ void AMammalManager::BreedMammals()
 	TArray<AMammal*> CurrentMammals = AllMammals;
 	for (auto Element : CurrentMammals)
 	{
-		Element->Breed(this);
+		Element->Breed();
 	}
 }
 
@@ -74,6 +89,25 @@ void AMammalManager::AgeMammals()
 	{
 		Element->GainAge();
 	}
+}
+
+void AMammalManager::MammalMovementChain(AMammal* MovingMammal)
+{
+	MammalPlayingTurn+=1;
+	if(AllMammals.Num() > MammalPlayingTurn)
+	{
+		AllMammals[MammalPlayingTurn]->Move();
+		AllMammals[MammalPlayingTurn]->StartPhysicalMovement();
+		AllMammals[MammalPlayingTurn]->OnMovementEnded.AddDynamic(this , &AMammalManager::MammalMovementChain);
+	}
+	else
+	{
+		OnAllMovementEnded.Broadcast();
+		AgeMammals();
+		BreedMammals();
+		HandleNewlyBredLists();
+	}
+	MovingMammal->OnMovementEnded.Clear();
 }
 
 void AMammalManager::HandleMammalDeath(AMammal* DeadMammal)
@@ -87,6 +121,16 @@ void AMammalManager::HandleMammalDeath(AMammal* DeadMammal)
 		Cats.Remove(Cat);
 	}
 	AllMammals.Remove(DeadMammal);
+}
+
+void AMammalManager::HandleNewlyBredLists()
+{
+	Cats.Append(NewlyBredCats);
+	Mouses.Append(NewlyBredMouses);
+	AllMammals.Append(NewlyBredCats);
+	AllMammals.Append(NewlyBredMouses);
+	NewlyBredMouses.Empty();
+	NewlyBredCats.Empty();
 }
 
 int AMammalManager::GetCatCount()

@@ -17,7 +17,7 @@ public:
 
 	virtual void GainAge() override;
 	virtual void Move() override;
-	virtual void Breed(AMammalManager* Spawner) override;
+	virtual void Breed() override;
 	
 	int TimeTillLastEaten;
 };

@@ -14,23 +14,20 @@ class ECOSISSIM_API ATurnManager : public AActor
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this actor's properties
 	ATurnManager();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
 	UFUNCTION(BlueprintCallable)
 	void StartGame(int32 GridSize , int32 CatCount , int32 MouseCount);
 	UFUNCTION(BlueprintCallable)
 	void ContinueRound();
+	UPROPERTY()
 	AMammalManager* MammalManager;
+	UPROPERTY()
 	AGridManager* GridManager;
 public:
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere , BlueprintReadOnly)
 	int RoundCount;
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 };

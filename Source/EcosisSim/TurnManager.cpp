@@ -46,17 +46,7 @@ void ATurnManager::StartGame(int32 GridSize, int32 CatCount, int32 MouseCount)
 void ATurnManager::ContinueRound()
 {
 	//First Move All Mammals
-	MammalManager->MoveMammals();
-	//Gain Age for all mammals , this is between moving and breeding because cats can eat before they starve.
-	MammalManager->AgeMammals();
-	//Then Breed all breedable Mammals
-	MammalManager->BreedMammals();
-	
-}
-
-// Called every frame
-void ATurnManager::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
+	MammalManager->StartMammalsTurn();
+	RoundCount += 1;
 }
 
